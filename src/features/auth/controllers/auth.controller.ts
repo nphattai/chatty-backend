@@ -2,7 +2,7 @@ import { IAuthDocument } from '@auth/interfaces/auth.interface';
 import { signupSchema } from '@auth/schemas/signup.schema';
 import { joiValidation } from '@global/decorators/joi-validation.decorators';
 import { upload } from '@global/helpers/cloudinary';
-import { BadRequestError } from '@global/helpers/error-handler';
+import { BadRequestError, CustomError } from '@global/helpers/error-handler';
 import { Helpers } from '@global/helpers/helpers';
 import { config } from '@root/config';
 import { authService } from '@service/db/auth.service';
@@ -84,7 +84,7 @@ export class Auth {
         }
       } as unknown as IUserDocument;
 
-      await userCache.saveUserToCache(userObjectId?.toString(), uId, userDataToCache);
+      await userCache.saveUserToCache(userObjectId?.toString(), userDataToCache);
 
       // Save auth data to DB
       authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
@@ -105,7 +105,11 @@ export class Auth {
       });
     } catch (error) {
       log.error(error);
-      throw new BadRequestError('Server error');
+      if (error instanceof CustomError) {
+        throw error;
+      } else {
+        throw new BadRequestError('Server error');
+      }
     }
   }
 

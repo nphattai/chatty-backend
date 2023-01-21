@@ -18,23 +18,9 @@ import { ObjectId } from 'mongodb';
 const userCache: UserCache = new UserCache();
 const log = config.createLogger('SIGN UP');
 
-export class Signup {
-  public async getMe(req: Request, res: Response): Promise<void> {
-    try {
-      const { userId } = req.body;
-      const userInfo = await userCache.getUserInfo(userId);
-      if (!userInfo) {
-        throw new BadRequestError('Invalid credentials');
-      }
-
-      res.status(200).json({ user: userInfo });
-    } catch (error) {
-      log.error(error);
-      throw new BadRequestError('Server error');
-    }
-  }
+export class Auth {
   @joiValidation(signupSchema)
-  public async create(req: Request, res: Response): Promise<void> {
+  public async signup(req: Request, res: Response): Promise<void> {
     try {
       const { username, email, password, avatarColor, avatarImage } = req.body;
 
@@ -107,7 +93,7 @@ export class Signup {
       userQueue.addUserJob('addUserToDB', { value: userDataToCache });
 
       // Sign token
-      const userJwt = Signup.prototype.signToken(authData, userObjectId);
+      const userJwt = Auth.prototype.signToken(authData, userObjectId);
 
       req.session = { jwt: userJwt };
 
@@ -137,4 +123,4 @@ export class Signup {
   }
 }
 
-export const signup = new Signup();
+export const auth = new Auth();

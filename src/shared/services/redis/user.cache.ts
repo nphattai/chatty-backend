@@ -11,21 +11,6 @@ export class UserCache extends BaseCache {
     super('userCache');
   }
 
-  public async getUserInfo(id: string): Promise<IUserDocument | null | undefined> {
-    try {
-      if (!this.client.isOpen) {
-        await this.client.connect();
-      }
-
-      const user = await this.client.get(id);
-      const userObject = user ? (JSON.parse(user) as IUserDocument) : null;
-      log.info(userObject);
-      return userObject;
-    } catch (error) {
-      log.error(error);
-    }
-  }
-
   public async saveUserToCache(key: string, userUId: string, createdUser: IUserDocument): Promise<void> {
     const createdAt = new Date();
     const {
@@ -101,7 +86,6 @@ export class UserCache extends BaseCache {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
-      // await this.client.set(`users:${key}`, JSON.stringify(createdUser));
       await this.client.ZADD('user', { score: parseInt(userUId, 10), value: `${key}` });
       await this.client.HSET(`users:${key}`, dataToSave);
     } catch (error) {

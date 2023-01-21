@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true,
     "target": "es2015",
     "module": "commonjs",
     "lib": ["DOM", "ES2015"],
@@ -29,6 +30,8 @@
       }
     ],
     "paths": {
+      "@auth/*": ["src/features/auth/*"],
+      "@user/*": ["src/features/user/*"],
       "@global/*": ["src/shared/globals/*"],
       "@service/*": ["src/shared/services/*"],
       "@socket/*": ["src/shared/sockets/*"],

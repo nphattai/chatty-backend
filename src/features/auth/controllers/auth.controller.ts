@@ -1,5 +1,5 @@
-import { userService } from '@service/db/user.service';
 import { IAuthDocument } from '@auth/interfaces/auth.interface';
+import { emailSchema, passwordSchema } from '@auth/schemas/password.schema';
 import { signInSchema } from '@auth/schemas/signin.schema';
 import { signupSchema } from '@auth/schemas/signup.schema';
 import { joiValidation } from '@global/decorators/joi-validation.decorators';
@@ -8,12 +8,19 @@ import { BadRequestError, CustomError } from '@global/helpers/error-handler';
 import { Helpers } from '@global/helpers/helpers';
 import { config } from '@root/config';
 import { authService } from '@service/db/auth.service';
+import { userService } from '@service/db/user.service';
+import { forgotPasswordTemplate } from '@service/emails/templates/forgot-password/forgot-password-template';
+import { resetPasswordTemplate } from '@service/emails/templates/reset-password/reset-password-template';
 import { authQueue } from '@service/queues/auth.queue';
+import { emailQueue } from '@service/queues/email.queue';
 import { userQueue } from '@service/queues/user.queue';
 import { UserCache } from '@service/redis/user.cache';
-import { IUserDocument } from '@user/interfaces/user.interface';
+import { IResetPasswordParams, IUserDocument } from '@user/interfaces/user.interface';
+import crypto from 'crypto';
+import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import HTTP_STATUS from 'http-status-codes';
+import publicIp from 'ip';
 import JWT from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 
@@ -185,6 +192,89 @@ export class Auth {
         message: 'Logout successfully',
         user: {}
       });
+    } catch (error) {
+      log.error(error);
+      if (error instanceof CustomError) {
+        throw error;
+      } else {
+        throw new BadRequestError('Server error');
+      }
+    }
+  }
+
+  @joiValidation(emailSchema)
+  public async forgotPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email } = req.body;
+
+      const existingUser = await authService.getUserByEmail(email);
+      if (!existingUser) {
+        throw new BadRequestError('Invalid credentials');
+      }
+
+      const randomBytes: Buffer = await Promise.resolve(crypto.randomBytes(20));
+      const randomCharacters: string = randomBytes.toString('hex');
+      const timeExpiration = Date.now() * 60 * 60 * 1000;
+
+      // Update password expiration
+      authService.updatePasswordToken(existingUser._id?.toString(), randomCharacters, timeExpiration);
+
+      // Send forgot password email
+      const resetLink = `${config.CLIENT_URL}/forgot-password?token=${randomCharacters}`;
+      const template = forgotPasswordTemplate.passwordResetTemplate(existingUser?.username, resetLink);
+      emailQueue.addEmailJob('forgotPasswordEmail', {
+        template,
+        receiverEmail: existingUser.email,
+        subject: 'Reset your password'
+      });
+
+      res.status(HTTP_STATUS.OK).json({ message: 'Password reset email sent.' });
+    } catch (error) {
+      log.error(error);
+      if (error instanceof CustomError) {
+        throw error;
+      } else {
+        throw new BadRequestError('Server error');
+      }
+    }
+  }
+
+  @joiValidation(passwordSchema)
+  public async updatePassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { password, confirmPassword } = req.body;
+      const { token } = req.params;
+
+      if (password !== confirmPassword) {
+        throw new BadRequestError('Passwords do not match');
+      }
+
+      const existingUser = await authService.getUserByPasswordResetToken(token);
+      if (!existingUser) {
+        throw new BadRequestError('Reset token has expired.');
+      }
+
+      // Update new information
+      existingUser.passwordResetToken = undefined;
+      existingUser.passwordResetExpires = undefined;
+      existingUser.password = password;
+      await existingUser.save();
+
+      // Send reset password confirmation email
+      const templateParams: IResetPasswordParams = {
+        username: existingUser.username,
+        email: existingUser.email,
+        ipaddress: publicIp.address(),
+        date: dayjs().format('DD/MM/YYYY HH:mm')
+      };
+      const template = resetPasswordTemplate.passwordResetConfirmationTemplate(templateParams);
+      emailQueue.addEmailJob('forgotPasswordEmail', {
+        template,
+        receiverEmail: existingUser.email,
+        subject: 'Password Reset Confirmation'
+      });
+
+      res.status(HTTP_STATUS.OK).json({ message: 'Password successfully updated.' });
     } catch (error) {
       log.error(error);
       if (error instanceof CustomError) {

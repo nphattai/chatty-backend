@@ -18,6 +18,14 @@ class AuthService {
 
     return user;
   }
+
+  public async getUserByName(username: string): Promise<IAuthDocument | null> {
+    const user = await AuthModel.findOne({
+      username
+    }).exec();
+
+    return user;
+  }
 }
 
 export const authService = new AuthService();

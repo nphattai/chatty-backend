@@ -1,4 +1,4 @@
-import { CustomError, IErrorResponse } from '@global/helper/error-handler';
+import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
 import { config } from '@root/config';
 import routes from '@root/routes';
 import { createAdapter } from '@socket.io/redis-adapter';

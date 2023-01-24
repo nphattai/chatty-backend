@@ -26,6 +26,26 @@ class AuthService {
 
     return user;
   }
+
+  public async getUserByEmail(email: string): Promise<IAuthDocument | null> {
+    const user = await AuthModel.findOne({
+      email
+    }).exec();
+
+    return user;
+  }
+
+  public async updatePasswordToken(authId: string, passwordResetToken: string, passwordResetExpires: number): Promise<void> {
+    await AuthModel.updateOne({ _id: authId }, { passwordResetToken, passwordResetExpires });
+  }
+
+  public async getUserByPasswordResetToken(passwordResetToken: string): Promise<IAuthDocument | null> {
+    const user = await AuthModel.findOne({
+      passwordResetToken
+    }).exec();
+
+    return user;
+  }
 }
 
 export const authService = new AuthService();

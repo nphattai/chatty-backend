@@ -6,6 +6,7 @@
 POST {{baseUrl}}/{{urlPath}}/me
 Content-Type: application/json
 Accept: application/json
+authorization: Bearer
 
 // LOGOUT
 ###
@@ -32,7 +33,7 @@ Accept: application/json
 withCredentials: true
 
 {
-  "username": "test1",
+  "username": "nphattai",
   "password": "12345678"
 }
 

@@ -4,7 +4,6 @@ import routes from '@root/routes';
 import { createAdapter } from '@socket.io/redis-adapter';
 import Logger from 'bunyan';
 import compression from 'compression';
-import cookieSession from 'cookie-session';
 import cors from 'cors';
 import { Application, json, NextFunction, Request, Response, urlencoded } from 'express';
 import 'express-async-errors';
@@ -35,14 +34,6 @@ export class ChattyServer {
   }
 
   private securityMiddleware(app: Application): void {
-    app.use(
-      cookieSession({
-        name: 'session',
-        keys: [config.SECRET_KEY_ONE || 'test1', config.SECRET_KEY_TWO || 'test2'],
-        maxAge: 24 * 7 * 3600 * 1000,
-        secure: config.NODE_ENV !== 'development'
-      })
-    );
     app.use(helmet());
     app.use(hpp());
     app.use(

@@ -22,8 +22,7 @@ import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import HTTP_STATUS from 'http-status-codes';
 import publicIp from 'ip';
-import JWT from 'jsonwebtoken';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 const userCache: UserCache = new UserCache();
 const log = config.createLogger('AUTH');
@@ -42,8 +41,8 @@ export class AuthController {
       }
 
       // Generate auth data
-      const authObjectId = new ObjectId();
-      const userObjectId = new ObjectId();
+      const authObjectId = new Types.ObjectId();
+      const userObjectId = new Types.ObjectId();
       const uId = Helpers.generateRandomIntegers(12)?.toString();
 
       // Generate user data
@@ -67,7 +66,7 @@ export class AuthController {
       const userDataToCache: IUserDocument = {
         ...authData,
         _id: userObjectId,
-        authId: authData?._id,
+        auth: authData?._id,
         profilePicture: `https://res.cloudinary.com/dyamr9ym3/image/upload/v${uploadAvatarRes?.version}/${userObjectId}`,
         blocked: [],
         blockedBy: [],
@@ -140,6 +139,10 @@ export class AuthController {
       }
 
       const userInfo = await userService.getUserByAuthId(existingUser.id);
+
+      if (!userInfo) {
+        throw new BadRequestError('Invalid credentials');
+      }
 
       // Sign token
       const userJwt = signToken(existingUser, userInfo!._id);

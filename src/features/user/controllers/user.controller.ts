@@ -9,7 +9,7 @@ const log = config.createLogger('USER');
 export class UserController {
   public async getMe(req: Request, res: Response): Promise<void> {
     try {
-      const { userId } = req.currentUser!;
+      const { userId = '' } = req.currentUser || {};
 
       const userInfo = await userService.getUserById(userId);
 

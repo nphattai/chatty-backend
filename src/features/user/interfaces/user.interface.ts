@@ -1,14 +1,8 @@
 import mongoose, { Document } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { IAuth } from '@auth/interfaces/auth.interface';
 
-export interface IUserDocument extends Document {
-  _id: string | ObjectId;
-  authId: string | ObjectId;
-  username?: string;
-  email?: string;
-  password?: string;
-  avatarColor?: string;
-  uId?: string;
+export interface IUser {
+  auth: string | mongoose.Types.ObjectId;
   postsCount: number;
   work: string;
   school: string;
@@ -23,14 +17,12 @@ export interface IUserDocument extends Document {
   bgImageVersion: string;
   bgImageId: string;
   profilePicture: string;
-  createdAt?: Date;
 }
 
-export interface IResetPasswordParams {
-  username: string;
-  email: string;
-  ipaddress: string;
-  date: string;
+export interface IUserDocument extends IUser, Document {}
+
+export interface PopulatedUser {
+  auth: IAuth;
 }
 
 export interface INotificationSettings {
@@ -40,13 +32,6 @@ export interface INotificationSettings {
   follows: boolean;
 }
 
-export interface IBasicInfo {
-  quote: string;
-  work: string;
-  school: string;
-  location: string;
-}
-
 export interface ISocialLinks {
   facebook: string;
   instagram: string;
@@ -54,26 +39,11 @@ export interface ISocialLinks {
   youtube: string;
 }
 
-export interface ISearchUser {
-  _id: string;
-  profilePicture: string;
+export interface IResetPasswordParams {
   username: string;
   email: string;
-  avatarColor: string;
-}
-
-export interface ISocketData {
-  blockedUser: string;
-  blockedBy: string;
-}
-
-export interface ILogin {
-  userId: string;
-}
-
-export interface IUserJobInfo {
-  key?: string;
-  value?: string | ISocialLinks;
+  ipaddress: string;
+  date: string;
 }
 
 export interface IUserJob {
@@ -87,9 +57,4 @@ export interface IEmailJob {
   receiverEmail: string;
   template: string;
   subject: string;
-}
-
-export interface IAllUsers {
-  users: IUserDocument[];
-  totalUsers: number;
 }

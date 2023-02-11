@@ -1,8 +1,8 @@
 import { IUserDocument } from '@user/interfaces/user.interface';
-import mongoose, { model, Model, Schema } from 'mongoose';
+import mongoose, { model, Schema } from 'mongoose';
 
 const userSchema: Schema = new Schema({
-  authId: { type: mongoose.Schema.Types.ObjectId, ref: 'Auth', index: true },
+  auth: { type: mongoose.Schema.Types.ObjectId, ref: 'Auth', index: true },
   profilePicture: { type: String, default: '' },
   postsCount: { type: Number, default: 0 },
   followersCount: { type: Number, default: 0 },
@@ -29,5 +29,5 @@ const userSchema: Schema = new Schema({
   bgImageId: { type: String, default: '' }
 });
 
-const UserModel: Model<IUserDocument> = model<IUserDocument>('User', userSchema, 'User');
+const UserModel = model<IUserDocument>('User', userSchema, 'User');
 export { UserModel };

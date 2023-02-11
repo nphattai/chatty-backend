@@ -8,13 +8,19 @@
     "sourceType": "module" // Allows for the use of imports
   },
   "rules": {
-    "semi": [2, "always"],
-    "space-before-function-paren": [0, { "anonymous": "always", "named": "always" }],
-    "camelcase": 0,
-    "no-return-assign": 0,
-    "quotes": ["error", "single"],
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/no-namespace": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off"
+    "no-shadow": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "varsIgnorePattern": "^_$" }],
+    "react-native/no-inline-styles": "off",
+    "react/no-did-mount-set-state": 0,
+    "semi": "off",
+    "@typescript-eslint/explicit-module-boundary-types": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/no-extra-semi": 0,
+    "@typescript-eslint/ban-types": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/ban-ts-comment": 0,
+    "no-undef": "off",
+    "@typescript-eslint/no-namespace": "off"
   }
 }

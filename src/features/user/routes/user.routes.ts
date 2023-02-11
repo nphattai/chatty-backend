@@ -10,7 +10,7 @@ class UserRoutes {
   }
 
   public routes(): Router {
-    this.router.post('/me', authMiddleware.checkAuthentication, UserController.prototype.getMe);
+    this.router.get('/me', authMiddleware.checkAuthentication, UserController.prototype.getMe);
 
     return this.router;
   }

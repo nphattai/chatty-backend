@@ -10,7 +10,8 @@
     "lint:fix": "eslint 'src/**/*.ts' --fix",
     "prettier:check": "prettier --check 'src/**/*.{ts, json}'",
     "prettier:fix": "prettier --write 'src/**/*.{ts, json}'",
-    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json"
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
+    "test": "jest --coverage=true -w=1 --forceExit --detectOpenHandles --watchAll=false"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +36,7 @@
     "hpp": "^0.2.3",
     "http-status-codes": "^2.2.0",
     "ip": "^1.1.8",
+    "jest": "^29.4.2",
     "joi": "^17.7.0",
     "jsonwebtoken": "^9.0.0",
     "lodash": "^4.17.21",

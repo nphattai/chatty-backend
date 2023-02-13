@@ -51,6 +51,8 @@
     "typescript-transform-paths": "^3.4.6"
   },
   "devDependencies": {
+    "@jest-mock/express": "^2.0.1",
+    "@jest/globals": "^29.4.2",
     "@types/bcryptjs": "^2.4.2",
     "@types/bunyan": "^1.8.8",
     "@types/compression": "^1.7.2",
@@ -60,6 +62,7 @@
     "@types/express": "^4.17.15",
     "@types/hpp": "^0.2.2",
     "@types/ip": "^1.1.0",
+    "@types/jest": "^29.4.0",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/lodash": "^4.14.191",
     "@types/nodemailer": "^6.4.7",
@@ -68,6 +71,7 @@
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
     "prettier": "^2.8.2",
+    "ts-jest": "^29.0.5",
     "tsc-alias": "^1.8.2",
     "tsconfig-paths": "^4.1.2"
   }

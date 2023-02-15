@@ -4,7 +4,7 @@ import mongoose, { model, Schema } from 'mongoose';
 const userSchema: Schema = new Schema({
   auth: { type: mongoose.Schema.Types.ObjectId, ref: 'Auth', index: true },
   profilePicture: { type: String, default: '' },
-  postsCount: { type: Number, default: 0 },
+  postCount: { type: Number, default: 0 },
   followersCount: { type: Number, default: 0 },
   followingCount: { type: Number, default: 0 },
   blocked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

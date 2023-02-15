@@ -78,7 +78,7 @@ export class AuthController {
         bgImageId: '',
         followersCount: 0,
         followingCount: 0,
-        postsCount: 0,
+        postCount: 0,
         notifications: {
           messages: true,
           reactions: true,

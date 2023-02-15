@@ -2,6 +2,7 @@ import { CustomError, IErrorResponse } from '@global/helpers/error-handler';
 import { config } from '@root/config';
 import routes from '@root/routes';
 import { createAdapter } from '@socket.io/redis-adapter';
+import { SocketIOPostHandler } from '@socket/post.socket';
 import Logger from 'bunyan';
 import compression from 'compression';
 import cors from 'cors';
@@ -104,7 +105,9 @@ export class ChattyServer {
     });
   }
 
-  private socketIOConnection(_server: Server): void {
-    log.info('socketIOConnection');
+  private socketIOConnection(io: Server): void {
+    const postSocketHandler = new SocketIOPostHandler(io);
+
+    postSocketHandler.listen();
   }
 }

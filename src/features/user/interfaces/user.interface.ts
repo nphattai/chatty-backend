@@ -3,7 +3,7 @@ import { IAuth } from '@auth/interfaces/auth.interface';
 
 export interface IUser {
   auth: string | mongoose.Types.ObjectId;
-  postsCount: number;
+  postCount: number;
   work: string;
   school: string;
   quote: string;

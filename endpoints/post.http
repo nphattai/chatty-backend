@@ -1,0 +1,18 @@
+@baseUrl = http://localhost:3001
+@urlPath = api/v1
+
+// CREATE POST
+###
+POST {{baseUrl}}/{{urlPath}}/create-post
+Content-Type: application/json
+Accept: application/json
+withCredentials: true
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2M2ViMzEyMTI4ZTg1ZDc1OTY5MGQxNGMiLCJ1SWQiOiI5ODI4NzExNzY0NTAiLCJlbWFpbCI6ImFsZm9uem8uY3JvbmEyNkBldGhlcmVhbC5lbWFpbCIsInVzZXJuYW1lIjoibnBoYXR0YWkiLCJhdmF0YXJDb2xvciI6ImJsdWUiLCJpYXQiOjE2NzYzNTc5MjMsImV4cCI6MTY3NjQ0NDMyM30.P8yHl1g-OgHHSP95SB-aBiLWnbQ4uEs8B0w60RR1RLs
+
+{
+  "post": "second post",
+  "bgColor": "red",
+  "privacy": "privacy text",
+  "gifUrl": "content",
+  "feelings": "content"
+}

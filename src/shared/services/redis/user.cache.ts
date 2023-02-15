@@ -22,4 +22,19 @@ export class UserCache extends BaseCache {
       throw new ServerError('Server error. Try again.');
     }
   }
+
+  public async getUserFromCache(userId: string): Promise<IUserDocument | null> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+      const userJson = await this.client.get(`users:${userId}`);
+      return userJson ? (JSON.parse(userJson) as IUserDocument) : null;
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
 }
+
+export const userCache = new UserCache();

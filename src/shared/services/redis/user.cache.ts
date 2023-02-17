@@ -24,7 +24,7 @@ export class UserCache extends BaseCache {
       blockedBy,
       postCount,
       profilePicture,
-      followersCount,
+      followerCount,
       followingCount,
       notifications,
       work,
@@ -48,7 +48,7 @@ export class UserCache extends BaseCache {
       `${avatarColor}`,
       'createdAt',
       `${createdAt}`,
-      'postsCount',
+      'postCount',
       `${postCount}`
     ];
     const secondList: string[] = [
@@ -58,8 +58,8 @@ export class UserCache extends BaseCache {
       JSON.stringify(blockedBy),
       'profilePicture',
       `${profilePicture}`,
-      'followersCount',
-      `${followersCount}`,
+      'followerCount',
+      `${followerCount}`,
       'followingCount',
       `${followingCount}`,
       'notifications',

@@ -10,7 +10,7 @@ export interface IUser {
   location: string;
   blocked: mongoose.Types.ObjectId[];
   blockedBy: mongoose.Types.ObjectId[];
-  followersCount: number;
+  followerCount: number;
   followingCount: number;
   notifications: INotificationSettings;
   social: ISocialLinks;

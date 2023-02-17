@@ -3,7 +3,6 @@ import { IPost } from '@post/interfaces/post.interface';
 import { config } from '@root/config';
 import { BaseCache } from '@service/redis/base.cache';
 import Logger from 'bunyan';
-import { userCache } from './user.cache';
 
 const log: Logger = config.createLogger('postCache');
 
@@ -12,25 +11,58 @@ export class PostCache extends BaseCache {
     super('postCache');
   }
 
-  /**
-   * Need to fix some issues:
-   * - user info not exist in cache, miss match between DB and cache
-   * - perf: get all info in user cache, override later => should pick and update only necessary field: refactor set => HSET
-   */
-  public async savePostToCache(userId: string, postId: string, createdPost: IPost): Promise<void> {
+  public async savePostToCache(userId: string, uId: string, postId: string, createdPost: IPost): Promise<void> {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
       }
 
-      const userCached = await userCache.getUserFromCache(userId);
+      const { post, bgColor, feelings, privacy, gifUrl, commentCount, imgVersion, imgId, videoId, videoVersion, reactions, createdAt } =
+        createdPost;
+
+      const firstList: string[] = [
+        '_id',
+        `${postId}`,
+        'user',
+        `${userId}`,
+        'post',
+        `${post}`,
+        'bgColor',
+        `${bgColor}`,
+        'feelings',
+        `${feelings}`,
+        'privacy',
+        `${privacy}`,
+        'gifUrl',
+        `${gifUrl}`
+      ];
+
+      const secondList: string[] = [
+        'commentCount',
+        `${commentCount}`,
+        'reactions',
+        JSON.stringify(reactions),
+        'imgVersion',
+        `${imgVersion}`,
+        'imgId',
+        `${imgId}`,
+        'videoId',
+        `${videoId}`,
+        'videoVersion',
+        `${videoVersion}`,
+        'createdAt',
+        `${createdAt}`
+      ];
+
+      const dataToSave = [...firstList, ...secondList];
+
+      const postCount: string[] = await this.client.HMGET(`users:${userId}`, 'postCount');
 
       const multi = this.client.multi();
 
-      const postCount = (userCached?.postCount || 0) + 1;
-
-      multi.set(`posts:${postId}`, JSON.stringify({ ...createdPost, _id: postId }));
-      multi.set(`users:${userId}`, JSON.stringify({ ...userCached, postCount }));
+      multi.ZADD('post', { score: parseInt(uId), value: `${postId}` });
+      multi.HSET(`posts:${postId}`, dataToSave);
+      multi.HSET(`users:${userId}`, ['postCount', parseInt(postCount[0]) + 1]);
 
       await multi.exec();
     } catch (error) {

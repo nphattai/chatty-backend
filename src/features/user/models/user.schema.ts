@@ -5,7 +5,7 @@ const userSchema: Schema = new Schema({
   auth: { type: mongoose.Schema.Types.ObjectId, ref: 'Auth', index: true },
   profilePicture: { type: String, default: '' },
   postCount: { type: Number, default: 0 },
-  followersCount: { type: Number, default: 0 },
+  followerCount: { type: Number, default: 0 },
   followingCount: { type: Number, default: 0 },
   blocked: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   blockedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

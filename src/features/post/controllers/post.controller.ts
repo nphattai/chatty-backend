@@ -15,7 +15,7 @@ export class PostController {
 
     const postObjectId = new Types.ObjectId();
 
-    const userId = req.currentUser?.userId || '';
+    const { userId = '', uId = '' } = req.currentUser || {};
 
     const createdPost = {
       _id: postObjectId,
@@ -25,7 +25,7 @@ export class PostController {
       feelings,
       privacy,
       gifUrl,
-      commentsCount: 0,
+      commentCount: 0,
       imgVersion: '',
       imgId: '',
       videoId: '',
@@ -36,7 +36,7 @@ export class PostController {
 
     socketIOPostObject.emit('create-post', createdPost);
 
-    await postCache.savePostToCache(userId, postObjectId.toString(), createdPost);
+    await postCache.savePostToCache(userId, uId, postObjectId.toString(), createdPost);
 
     postQueue.addPostJob('addPostToDB', {
       userId,

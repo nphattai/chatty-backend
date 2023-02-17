@@ -4,7 +4,7 @@ export interface IPost {
   user: string;
   post: string;
   bgColor: string;
-  commentsCount: number;
+  commentCount: number;
   imgVersion?: string;
   imgId?: string;
   videoId?: string;
@@ -15,6 +15,7 @@ export interface IPost {
   reactions?: IReactions;
   createdAt?: Date;
 }
+
 export interface IPostDocument extends IPost, Document {}
 
 export interface IReactions {

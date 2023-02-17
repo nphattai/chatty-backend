@@ -75,7 +75,7 @@ export class AuthController {
         quote: '',
         bgImageVersion: '',
         bgImageId: '',
-        followersCount: 0,
+        followerCount: 0,
         followingCount: 0,
         postCount: 0,
         notifications: {

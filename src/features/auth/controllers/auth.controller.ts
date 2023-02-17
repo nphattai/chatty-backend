@@ -1,7 +1,7 @@
 import { IAuthDocument } from '@auth/interfaces/auth.interface';
-import { emailSchema, passwordSchema } from '@auth/schemas/password.schema';
-import { signInSchema } from '@auth/schemas/signin.schema';
-import { signupSchema } from '@auth/schemas/signup.schema';
+import { emailSchema, passwordSchema } from '@auth/schemes/password.scheme';
+import { signInSchema } from '@auth/schemes/signin.scheme';
+import { signupSchema } from '@auth/schemes/signup.scheme';
 import { joiValidation } from '@global/decorators/joi-validation.decorators';
 import { upload } from '@global/helpers/cloudinary';
 import { BadRequestError, CustomError } from '@global/helpers/error-handler';
@@ -63,8 +63,7 @@ export class AuthController {
       }
 
       // Cache user data
-      const userDataToCache: IUserDocument = {
-        ...authData,
+      const userDataToCache = {
         _id: userObjectId,
         auth: authData?._id,
         profilePicture: `https://res.cloudinary.com/dyamr9ym3/image/upload/v${uploadAvatarRes?.version}/${userObjectId}`,
@@ -91,15 +90,22 @@ export class AuthController {
           twitter: '',
           youtube: ''
         }
-      } as unknown as IUserDocument;
+      };
 
-      await userCache.saveUserToCache(userObjectId?.toString(), userDataToCache);
+      await userCache.saveUserToCache(userObjectId?.toString(), uId, {
+        ...userDataToCache,
+        username,
+        uId,
+        email,
+        avatarColor,
+        createdAt: authData.createdAt
+      });
 
       // Save auth data to DB
       authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
 
       // Save user data to DB
-      userQueue.addUserJob('addUserToDB', { value: userDataToCache });
+      userQueue.addUserJob('addUserToDB', { value: userDataToCache as unknown as IUserDocument });
 
       // Sign token
       const userJwt = signToken(authData, userObjectId);

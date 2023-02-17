@@ -1,4 +1,4 @@
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 import { IAuth } from '@auth/interfaces/auth.interface';
 
 export interface IUser {
@@ -20,6 +20,8 @@ export interface IUser {
 }
 
 export interface IUserDocument extends IUser, Document {}
+
+export type IUserCache = IUser & Pick<IAuth, 'email' | 'username' | 'avatarColor' | 'uId' | 'createdAt'> & { _id: Types.ObjectId };
 
 export interface PopulatedUser {
   auth: IAuth;

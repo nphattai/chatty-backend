@@ -1,6 +1,7 @@
 import { BadRequestError, CustomError } from '@global/helpers/error-handler';
 import { config } from '@root/config';
 import { userService } from '@service/db/user.service';
+import { userCache } from '@service/redis/user.cache';
 import { Request, Response } from 'express';
 import HTTP_STATUS from 'http-status-codes';
 
@@ -11,7 +12,9 @@ export class UserController {
     try {
       const { userId = '' } = req.currentUser || {};
 
-      const userInfo = await userService.getUserById(userId);
+      const userCached = await userCache.getUserFromCache(userId);
+
+      const userInfo = userCached ? userCached : await userService.getUserById(userId);
 
       // Response to client
       res.status(HTTP_STATUS.OK).json({

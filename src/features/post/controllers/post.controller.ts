@@ -5,7 +5,6 @@ import { postSchema } from '@post/schemes/post.scheme';
 import { postService } from '@service/db/post.service';
 import { postQueue } from '@service/queues/post.queue';
 import { postCache } from '@service/redis/post.cache';
-import { socketIOPostObject } from '@socket/post.socket';
 import { Request, Response } from 'express';
 import HTTP_STATUS from 'http-status-codes';
 import { Types } from 'mongoose';
@@ -36,7 +35,8 @@ export class PostController {
       reactions: { like: 0, love: 0, happy: 0, sad: 0, wow: 0, angry: 0 }
     } as IPostDocument;
 
-    socketIOPostObject.emit('create-post', createdPost);
+    // Todo: fix not working
+    // socketIOPostObject.emit('create-post', createdPost);
 
     await postCache.savePostToCache(userId, uId, postObjectId.toString(), createdPost);
 
@@ -75,6 +75,26 @@ export class PostController {
       }
 
       res.status(HTTP_STATUS.OK).json({ message: 'Get post successfully', posts: result });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      } else {
+        throw new BadRequestError('Server error');
+      }
+    }
+  }
+
+  public async deletePostById(req: Request, res: Response) {
+    try {
+      const { id } = req.query as { id: string };
+
+      if (!id) {
+        throw new BadRequestError('Post id should not be empty');
+      }
+
+      await Promise.all([postCache.deletePostById(id), postService.deletePostById(id)]);
+
+      res.status(HTTP_STATUS.OK).json({ message: `Delete post ${id} successfully` });
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;

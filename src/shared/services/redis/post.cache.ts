@@ -105,6 +105,43 @@ export class PostCache extends BaseCache {
       throw new ServerError('Server error. Try again.');
     }
   }
+
+  public async deletePostById(postId: string) {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      // find post in cache by id
+      const post = await this.client.HGETALL(`posts:${postId}`);
+
+      const postObject = {} as IPost & { _id: string };
+      for (const key in post) {
+        // @ts-ignore
+        postObject[key] = Helpers.parseJson(`${post[key]}`);
+      }
+
+      const { user: userId } = postObject;
+
+      const multi = this.client.multi();
+
+      // update postCount for owner
+      const postCount: string[] = await this.client.HMGET(`users:${userId}`, 'postCount');
+      multi.HSET(`users:${userId}`, ['postCount', parseInt(postCount[0]) - 1]);
+
+      // delete post
+      const allKey = await this.client.HKEYS(`posts:${postId}`);
+      multi.HDEL(`posts:${postId}`, allKey);
+
+      // remove post in sorted post by score
+      multi.ZREM(`post`, postId);
+
+      await multi.exec();
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
 }
 
 export const postCache = new PostCache();

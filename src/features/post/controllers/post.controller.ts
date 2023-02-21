@@ -92,7 +92,9 @@ export class PostController {
         throw new BadRequestError('Post id should not be empty');
       }
 
-      await Promise.all([postCache.deletePostById(id), postService.deletePostById(id)]);
+      const { userId = '' } = req.currentUser || {};
+
+      await Promise.all([postCache.deletePostById(id, userId), postService.deletePostById(id, userId)]);
 
       res.status(HTTP_STATUS.OK).json({ message: `Delete post ${id} successfully` });
     } catch (error) {

@@ -15,11 +15,15 @@ class PostService {
     return result;
   }
 
-  public async deletePostById(postId: string): Promise<void> {
+  public async deletePostById(postId: string, userId: string): Promise<void> {
     const post = await PostModel.findOne({ _id: postId });
 
     if (!post) {
-      throw new BadRequestError(`Can not find post ${postId}`);
+      throw new BadRequestError(`Can not find post`);
+    }
+
+    if (post?.user !== userId) {
+      throw new BadRequestError('Not owner of this post');
     }
 
     await PostModel.deleteOne({ _id: postId });

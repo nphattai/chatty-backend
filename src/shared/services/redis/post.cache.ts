@@ -1,4 +1,4 @@
-import { ServerError } from '@global/helpers/error-handler';
+import { BadRequestError, CustomError, NotFoundError, ServerError } from '@global/helpers/error-handler';
 import { Helpers } from '@global/helpers/helpers';
 import { IPost } from '@post/interfaces/post.interface';
 import { config } from '@root/config';
@@ -106,7 +106,7 @@ export class PostCache extends BaseCache {
     }
   }
 
-  public async deletePostById(postId: string) {
+  public async deletePostById(postId: string, userId: string) {
     try {
       if (!this.client.isOpen) {
         await this.client.connect();
@@ -121,7 +121,13 @@ export class PostCache extends BaseCache {
         postObject[key] = Helpers.parseJson(`${post[key]}`);
       }
 
-      const { user: userId } = postObject;
+      if (!postObject?._id) {
+        throw new NotFoundError('Can not find post');
+      }
+
+      if (postObject?.user !== userId) {
+        throw new BadRequestError('Not owner of this post');
+      }
 
       const multi = this.client.multi();
 
@@ -130,16 +136,18 @@ export class PostCache extends BaseCache {
       multi.HSET(`users:${userId}`, ['postCount', parseInt(postCount[0]) - 1]);
 
       // delete post
-      const allKey = await this.client.HKEYS(`posts:${postId}`);
-      multi.HDEL(`posts:${postId}`, allKey);
+      multi.DEL(`posts:${postId}`);
 
       // remove post in sorted post by score
       multi.ZREM(`post`, postId);
 
       await multi.exec();
     } catch (error) {
-      log.error(error);
-      throw new ServerError('Server error. Try again.');
+      if (error instanceof CustomError) {
+        throw error;
+      } else {
+        throw new BadRequestError('Server error');
+      }
     }
   }
 }

@@ -94,7 +94,9 @@ export class PostController {
 
       const { userId = '' } = req.currentUser || {};
 
-      await Promise.all([postCache.deletePostById(id, userId), postService.deletePostById(id, userId)]);
+      await postCache.deletePostById(id, userId);
+
+      postQueue.addPostJob('deletePostById', { postId: id, userId });
 
       res.status(HTTP_STATUS.OK).json({ message: `Delete post ${id} successfully` });
     } catch (error) {

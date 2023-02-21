@@ -22,7 +22,7 @@ class PostService {
       throw new BadRequestError(`Can not find post`);
     }
 
-    if (post?.user !== userId) {
+    if (post?.user?.toString() !== userId) {
       throw new BadRequestError('Not owner of this post');
     }
 

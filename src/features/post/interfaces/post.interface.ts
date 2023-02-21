@@ -27,7 +27,14 @@ export interface IReactions {
   angry: number;
 }
 
-export interface IPostJob {
+export interface ICreatePostJob {
   userId: string;
   createdPost: IPostDocument;
 }
+
+export interface IDeletePostJob {
+  userId: string;
+  postId: string;
+}
+
+export type IPostJob = ICreatePostJob | IDeletePostJob;

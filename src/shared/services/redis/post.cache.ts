@@ -1,4 +1,5 @@
 import { ServerError } from '@global/helpers/error-handler';
+import { Helpers } from '@global/helpers/helpers';
 import { IPost } from '@post/interfaces/post.interface';
 import { config } from '@root/config';
 import { BaseCache } from '@service/redis/base.cache';
@@ -65,6 +66,40 @@ export class PostCache extends BaseCache {
       multi.HSET(`users:${userId}`, ['postCount', parseInt(postCount[0]) + 1]);
 
       await multi.exec();
+    } catch (error) {
+      log.error(error);
+      throw new ServerError('Server error. Try again.');
+    }
+  }
+
+  public async getPostsFromCache(start: number, end: number): Promise<any> {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      const postIds = await this.client.ZRANGE('post', start, end - 1, { REV: true });
+
+      const multi = this.client.multi();
+
+      for (const postId of postIds) {
+        multi.HGETALL(`posts:${postId}`);
+      }
+
+      const result = (await multi.exec()) as unknown as IPost[];
+
+      const posts = result.map((post) => {
+        const postObject = {} as IPost;
+
+        for (const key in post) {
+          // @ts-ignore
+          postObject[key] = Helpers.parseJson(`${post[key]}`);
+        }
+
+        return postObject;
+      });
+
+      return posts;
     } catch (error) {
       log.error(error);
       throw new ServerError('Server error. Try again.');

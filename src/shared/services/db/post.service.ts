@@ -8,6 +8,11 @@ class PostService {
     const user = UserModel.updateOne({ _id: userId }, { $inc: { postCount: 1 } });
     await Promise.all([post, user]);
   }
+
+  public async getPost(skip: number, limit: number): Promise<IPostDocument> {
+    const result = (await await PostModel.find({}).sort({ _id: -1 }).skip(skip).limit(limit)) as unknown as IPostDocument;
+    return result;
+  }
 }
 
 export const postService = new PostService();

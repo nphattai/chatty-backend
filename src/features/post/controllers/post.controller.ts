@@ -1,6 +1,8 @@
 import { joiValidation } from '@global/decorators/joi-validation.decorators';
+import { BadRequestError, CustomError } from '@global/helpers/error-handler';
 import { IPostDocument } from '@post/interfaces/post.interface';
 import { postSchema } from '@post/schemes/post.scheme';
+import { postService } from '@service/db/post.service';
 import { postQueue } from '@service/queues/post.queue';
 import { postCache } from '@service/redis/post.cache';
 import { socketIOPostObject } from '@socket/post.socket';
@@ -47,5 +49,38 @@ export class PostController {
       message: 'Post created successfully',
       post: createdPost
     });
+  }
+
+  public async getPosts(req: Request, res: Response) {
+    try {
+      const { page, limit } = req.query as { page: string; limit: string };
+
+      if (!page || !limit) {
+        throw new BadRequestError('Page and limit should not be empty');
+      }
+
+      const start = (parseInt(page) - 1) * parseInt(limit);
+
+      const end = parseInt(page) * parseInt(limit);
+
+      let result = {};
+      // Get posts from cache
+      const postFromCache = await postCache.getPostsFromCache(start, end);
+
+      if (postFromCache) {
+        result = postFromCache;
+      } else {
+        // Get post from DB
+        result = await postService.getPost(start, end);
+      }
+
+      res.status(HTTP_STATUS.OK).json({ message: 'Get post successfully', posts: result });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      } else {
+        throw new BadRequestError('Server error');
+      }
+    }
   }
 }

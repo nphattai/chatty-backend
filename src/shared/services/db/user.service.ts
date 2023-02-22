@@ -1,55 +1,21 @@
-import { IUserDocument } from '@user/interfaces/user.interface';
+import { IAuth } from '@auth/interfaces/auth.interface';
+import { IUserDocument, PopulatedUser } from '@user/interfaces/user.interface';
 import { UserModel } from '@user/models/user.schema';
-import mongoose from 'mongoose';
 
 class UserService {
   public async addUserData(data: IUserDocument): Promise<void> {
     await UserModel.create(data);
   }
 
-  public async getUserByAuthId(authId: string): Promise<IUserDocument | null> {
-    const users: IUserDocument[] = await UserModel.aggregate([
-      { $match: { authId: new mongoose.Types.ObjectId(authId) } },
-      { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } },
-      { $unwind: '$authId' },
-      { $project: this.aggregateProject() }
-    ]);
-    return users[0];
+  public async getUserByAuthId(authId: string): Promise<(Omit<IUserDocument, 'auth'> & { auth: IAuth }) | null> {
+    const user = await UserModel.findOne({ auth: authId }).populate<Pick<PopulatedUser, 'auth'>>({ path: 'auth' });
+    return user;
   }
 
-  public async getUserById(id: string): Promise<IUserDocument | null> {
-    const users: IUserDocument[] = await UserModel.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(id) } },
-      { $lookup: { from: 'Auth', localField: 'authId', foreignField: '_id', as: 'authId' } },
-      { $unwind: '$authId' },
-      { $project: this.aggregateProject() }
-    ]);
-    return users[0];
-  }
+  public async getUserById(id: string): Promise<(Omit<IUserDocument, 'auth'> & { auth: IAuth }) | null> {
+    const user = await UserModel.findOne({ _id: id }).populate<Pick<PopulatedUser, 'auth'>>({ path: 'auth' });
 
-  private aggregateProject() {
-    return {
-      _id: 1,
-      username: '$authId.username',
-      uId: '$authId.uId',
-      email: '$authId.email',
-      avatarColor: '$authId.avatarColor',
-      createdAt: '$authId.createdAt',
-      postsCount: 1,
-      work: 1,
-      school: 1,
-      quote: 1,
-      location: 1,
-      blocked: 1,
-      blockedBy: 1,
-      followersCount: 1,
-      followingCount: 1,
-      notifications: 1,
-      social: 1,
-      bgImageVersion: 1,
-      bgImageId: 1,
-      profilePicture: 1
-    };
+    return user;
   }
 }
 

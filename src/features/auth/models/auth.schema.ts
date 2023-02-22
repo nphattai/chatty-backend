@@ -40,5 +40,5 @@ authSchema.methods.hashPassword = async function (password: string): Promise<str
   return hash(password, SALT_ROUND);
 };
 
-const AuthModel: Model<IAuthDocument> = model<IAuthDocument>('Auth', authSchema, 'Auth');
+const AuthModel = model<IAuthDocument>('Auth', authSchema, 'Auth');
 export { AuthModel };

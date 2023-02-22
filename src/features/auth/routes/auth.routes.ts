@@ -1,5 +1,4 @@
-import { Auth } from '@auth/controllers/auth.controller';
-import { authMiddleware } from '@global/helpers/auth-middleware';
+import { AuthController } from '@auth/controllers/auth.controller';
 import express, { Router } from 'express';
 
 class AuthRoutes {
@@ -10,13 +9,10 @@ class AuthRoutes {
   }
 
   public routes(): Router {
-    this.router.post('/signup', Auth.prototype.signup);
-    this.router.post('/signin', Auth.prototype.signIn);
-    this.router.post('/logout', Auth.prototype.logout);
-    this.router.post('/forgot-password', Auth.prototype.forgotPassword);
-    this.router.post('/reset-password/:token', Auth.prototype.updatePassword);
-
-    this.router.post('/me', authMiddleware.checkAuthentication, Auth.prototype.getMe);
+    this.router.post('/signup', AuthController.prototype.signup);
+    this.router.post('/signin', AuthController.prototype.signIn);
+    this.router.post('/forgot-password', AuthController.prototype.forgotPassword);
+    this.router.post('/reset-password/:token', AuthController.prototype.updatePassword);
 
     return this.router;
   }

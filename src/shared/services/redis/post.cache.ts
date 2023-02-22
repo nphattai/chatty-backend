@@ -1,6 +1,6 @@
 import { BadRequestError, CustomError, NotFoundError, ServerError } from '@global/helpers/error-handler';
 import { Helpers } from '@global/helpers/helpers';
-import { IPost } from '@post/interfaces/post.interface';
+import { IPost, IUpdatePostPayload } from '@post/interfaces/post.interface';
 import { config } from '@root/config';
 import { BaseCache } from '@service/redis/base.cache';
 import Logger from 'bunyan';
@@ -143,6 +143,54 @@ export class PostCache extends BaseCache {
 
       await multi.exec();
     } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      } else {
+        throw new BadRequestError('Server error');
+      }
+    }
+  }
+
+  public async updatePostById(postId: string, userId: string, payload: IUpdatePostPayload) {
+    try {
+      if (!this.client.isOpen) {
+        await this.client.connect();
+      }
+
+      // find post in cache by id
+      const post = await this.client.HGETALL(`posts:${postId}`);
+
+      const postObject = {} as IPost & { _id: string };
+      for (const key in post) {
+        // @ts-ignore
+        postObject[key] = Helpers.parseJson(`${post[key]}`);
+      }
+
+      if (!postObject?._id) {
+        throw new NotFoundError('Can not find post');
+      }
+
+      if (postObject?.user !== userId) {
+        throw new BadRequestError('Not owner of this post');
+      }
+
+      const multi = this.client.multi();
+
+      // @ts-ignore
+      Object.keys(payload).forEach((key) => (payload[key] === undefined || payload[key] == null) && delete payload[key]);
+
+      const payloadKeys = Object.keys(payload);
+
+      for (const key of payloadKeys) {
+        // @ts-ignore
+        const value = payload[key];
+
+        multi.HSET(`posts:${postId}`, [key, typeof value === 'string' ? value : JSON.stringify(value)]);
+      }
+
+      await multi.exec();
+    } catch (error) {
+      log.error(error);
       if (error instanceof CustomError) {
         throw error;
       } else {

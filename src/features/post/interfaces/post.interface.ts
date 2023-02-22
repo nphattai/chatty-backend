@@ -37,4 +37,12 @@ export interface IDeletePostJob {
   postId: string;
 }
 
-export type IPostJob = ICreatePostJob | IDeletePostJob;
+export interface IUpdatePostJob {
+  userId: string;
+  postId: string;
+  payload: IUpdatePostPayload;
+}
+
+export type IPostJob = ICreatePostJob | IDeletePostJob | IUpdatePostJob;
+
+export type IUpdatePostPayload = Pick<IPost, 'post' | 'bgColor' | 'feelings' | 'privacy' | 'gifUrl'>;

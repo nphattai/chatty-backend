@@ -1,6 +1,6 @@
 import { joiValidation } from '@global/decorators/joi-validation.decorators';
 import { BadRequestError, CustomError } from '@global/helpers/error-handler';
-import { IPostDocument } from '@post/interfaces/post.interface';
+import { IPostDocument, IUpdatePostPayload } from '@post/interfaces/post.interface';
 import { postSchema } from '@post/schemes/post.scheme';
 import { postService } from '@service/db/post.service';
 import { postQueue } from '@service/queues/post.queue';
@@ -99,6 +99,32 @@ export class PostController {
       postQueue.addPostJob('deletePostById', { postId: id, userId });
 
       res.status(HTTP_STATUS.OK).json({ message: `Delete post ${id} successfully` });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      } else {
+        throw new BadRequestError('Server error');
+      }
+    }
+  }
+
+  @joiValidation(postSchema)
+  public async updatePostById(req: Request, res: Response) {
+    try {
+      const { id } = req.params as { id: string };
+      const { post, bgColor, feelings, privacy, gifUrl } = req.body as IUpdatePostPayload;
+
+      if (!id) {
+        throw new BadRequestError('Post id should not be empty');
+      }
+
+      const { userId = '' } = req.currentUser || {};
+
+      await postCache.updatePostById(id, userId, { post, bgColor, feelings, privacy, gifUrl });
+
+      postQueue.addPostJob('updatePostById', { postId: id, userId, payload: { post, bgColor, feelings, privacy, gifUrl } });
+
+      res.status(HTTP_STATUS.OK).json({ message: `Update post ${id} successfully` });
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;

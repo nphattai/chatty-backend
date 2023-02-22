@@ -12,7 +12,7 @@ class PostRoutes {
   public routes(): Router {
     this.router.post('/create-post', authMiddleware.checkAuthentication, PostController.prototype.createPost);
     this.router.get('/get-all-post', authMiddleware.checkAuthentication, PostController.prototype.getPosts);
-    this.router.get('/delete-post', authMiddleware.checkAuthentication, PostController.prototype.deletePostById);
+    this.router.delete('/delete-post', authMiddleware.checkAuthentication, PostController.prototype.deletePostById);
     this.router.put('/update-post/:id', authMiddleware.checkAuthentication, PostController.prototype.updatePostById);
 
     return this.router;

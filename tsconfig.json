@@ -30,6 +30,7 @@
       }
     ],
     "paths": {
+      "@health/*": ["src/features/health/*"],
       "@auth/*": ["src/features/auth/*"],
       "@user/*": ["src/features/user/*"],
       "@post/*": ["src/features/post/*"],

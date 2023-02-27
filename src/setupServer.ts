@@ -15,7 +15,7 @@ import HTTP_STATUS from 'http-status-codes';
 import { createClient } from 'redis';
 import { Server } from 'socket.io';
 
-const PORT = 3001;
+const PORT = 5000;
 
 const log: Logger = config.createLogger('server');
 

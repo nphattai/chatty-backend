@@ -7,3 +7,6 @@ build
 coverage
 
 deployment/.terraform
+deployment/*.tfstate
+deployment/*.tfstate.backup
+

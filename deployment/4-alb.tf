@@ -1,3 +1,4 @@
+#region Create ALB
 resource "aws_alb" "application_load_balancer" {
   name                       = "${local.prefix}-alb"
   load_balancer_type         = "application"
@@ -13,7 +14,9 @@ resource "aws_alb" "application_load_balancer" {
     tomap({ "Name" = "${local.prefix}-ALB" })
   )
 }
+#endregion
 
+#region Create ALB listener
 resource "aws_alb_listener" "alb_https_listener" {
   load_balancer_arn = aws_alb.application_load_balancer.arn
   port              = 443
@@ -46,18 +49,50 @@ resource "aws_alb_listener" "alb_http_listener" {
   }
 }
 
-resource "aws_alb_listener_rule" "alb_https_listener_rule" {
-  listener_arn = aws_alb_listener.alb_http_listener.arn
-  priority     = 100
-  action {
-    type             = "forward"
-    target_group_arn = aws_alb_target_group.server_backend_tg.arn
+# resource "aws_alb_listener_rule" "alb_https_listener_rule" {
+#   listener_arn = aws_alb_listener.alb_http_listener.arn
+#   priority     = 100
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_alb_target_group.server_backend_tg.arn
+#   }
+
+#   condition {
+#     path_pattern {
+#       values = ["/*"]
+#     }
+#   }
+
+# }
+#endregion
+
+#region Create ALB target group
+resource "aws_alb_target_group" "server_backend_tg" {
+  name                 = "${local.prefix}-tg"
+  vpc_id               = aws_vpc.main.id
+  port                 = var.default_api_port
+  protocol             = "HTTP"
+  deregistration_delay = 60
+
+  health_check {
+    path                = "/health"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    healthy_threshold   = 2
+    unhealthy_threshold = 10
+    interval            = 120
+    timeout             = 100
+    matcher             = "200"
   }
 
-  condition {
-    path_pattern {
-      values = ["/*"]
-    }
+  stickiness {
+    type        = "app_cookie"
+    cookie_name = "session"
   }
 
+  tags = merge(
+    local.common_tags,
+    tomap({ "Name" = "${local.prefix}-tg" })
+  )
 }
+#endregion

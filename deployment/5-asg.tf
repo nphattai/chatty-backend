@@ -53,6 +53,32 @@ resource "aws_launch_configuration" "asg_launch_configuration" {
   }
 }
 
+resource "aws_iam_role_policy" "ec2_iam_role_policy" {
+  name   = var.ec2_iam_role_policy_name
+  role   = aws_iam_role.ec2_iam_role.id
+  policy = <<EOF
+{
+  "Version" : "2012-10-17",
+  "Statement" : [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:*",
+        "s3:*",
+        "elasticloadbalancing:*",
+        "cloudwatch:*",
+        "logs:*",
+        "autoscaling:*",
+        "sns:Publish",
+        "tag:GetResources"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = var.ec2_instance_profile_name
   role = aws_iam_role.ec2_iam_role.name

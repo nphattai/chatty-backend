@@ -1,9 +1,15 @@
 import { IAuthDocument } from '@auth/interfaces/auth.interface';
 import { AuthModel } from '@auth/models/auth.schema';
+import { config } from '@root/config';
 
+const log = config.createLogger('AuthService');
 class AuthService {
   public async createAuthUser(data: IAuthDocument): Promise<void> {
-    await AuthModel.create(data);
+    try {
+      await AuthModel.create(data);
+    } catch (error) {
+      log.error(error);
+    }
   }
 
   public async getUserByNameOrEmail(username: string, email: string): Promise<IAuthDocument | null> {

@@ -104,12 +104,12 @@ export class AuthController {
       // Save auth data to DB
       // authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
 
-      authService.createAuthUser(authData);
+      await authService.createAuthUser(authData);
 
       // Save user data to DB
       // userQueue.addUserJob('addUserToDB', { value: userDataToCache as unknown as IUserDocument });
 
-      userService.addUserData(userDataToCache as unknown as IUserDocument);
+      await userService.addUserData(userDataToCache as unknown as IUserDocument);
 
       // Sign token
       const userJwt = signToken(authData, userObjectId);

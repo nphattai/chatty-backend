@@ -92,14 +92,14 @@ export class AuthController {
         }
       };
 
-      await userCache.saveUserToCache(userObjectId?.toString(), uId, {
-        ...userDataToCache,
-        username,
-        uId,
-        email,
-        avatarColor,
-        createdAt: authData.createdAt
-      });
+      // await userCache.saveUserToCache(userObjectId?.toString(), uId, {
+      //   ...userDataToCache,
+      //   username,
+      //   uId,
+      //   email,
+      //   avatarColor,
+      //   createdAt: authData.createdAt
+      // });
 
       // Save auth data to DB
       authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });

@@ -15,7 +15,7 @@ import { resetPasswordTemplate } from '@service/emails/templates/reset-password/
 import { authQueue } from '@service/queues/auth.queue';
 import { emailQueue } from '@service/queues/email.queue';
 import { userQueue } from '@service/queues/user.queue';
-import { UserCache } from '@service/redis/user.cache';
+// import { UserCache } from '@service/redis/user.cache';
 import { IResetPasswordParams, IUserDocument } from '@user/interfaces/user.interface';
 import crypto from 'crypto';
 import dayjs from 'dayjs';
@@ -24,7 +24,7 @@ import HTTP_STATUS from 'http-status-codes';
 import publicIp from 'ip';
 import { Types } from 'mongoose';
 
-const userCache: UserCache = new UserCache();
+// const userCache: UserCache = new UserCache();
 const log = config.createLogger('AUTH');
 
 export class AuthController {
@@ -102,14 +102,14 @@ export class AuthController {
       // });
 
       // Save auth data to DB
-      // authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
+      authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });
 
-      await authService.createAuthUser(authData);
+      // await authService.createAuthUser(authData);
 
       // Save user data to DB
-      // userQueue.addUserJob('addUserToDB', { value: userDataToCache as unknown as IUserDocument });
+      userQueue.addUserJob('addUserToDB', { value: userDataToCache as unknown as IUserDocument });
 
-      await userService.addUserData(userDataToCache as unknown as IUserDocument);
+      // await userService.addUserData(userDataToCache as unknown as IUserDocument);
 
       // Sign token
       const userJwt = signToken(authData, userObjectId);

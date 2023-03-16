@@ -15,7 +15,7 @@ import { resetPasswordTemplate } from '@service/emails/templates/reset-password/
 import { authQueue } from '@service/queues/auth.queue';
 import { emailQueue } from '@service/queues/email.queue';
 import { userQueue } from '@service/queues/user.queue';
-// import { UserCache } from '@service/redis/user.cache';
+import { UserCache } from '@service/redis/user.cache';
 import { IResetPasswordParams, IUserDocument } from '@user/interfaces/user.interface';
 import crypto from 'crypto';
 import dayjs from 'dayjs';
@@ -24,7 +24,7 @@ import HTTP_STATUS from 'http-status-codes';
 import publicIp from 'ip';
 import { Types } from 'mongoose';
 
-// const userCache: UserCache = new UserCache();
+const userCache: UserCache = new UserCache();
 const log = config.createLogger('AUTH');
 
 export class AuthController {
@@ -92,14 +92,14 @@ export class AuthController {
         }
       };
 
-      // await userCache.saveUserToCache(userObjectId?.toString(), uId, {
-      //   ...userDataToCache,
-      //   username,
-      //   uId,
-      //   email,
-      //   avatarColor,
-      //   createdAt: authData.createdAt
-      // });
+      await userCache.saveUserToCache(userObjectId?.toString(), uId, {
+        ...userDataToCache,
+        username,
+        uId,
+        email,
+        avatarColor,
+        createdAt: authData.createdAt
+      });
 
       // Save auth data to DB
       authQueue.addAuthUserJob('addAuthUserToDB', { value: authData });

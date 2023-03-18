@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#install code deploy agents
+sudo yum update -y
+sudo yum install ruby -y
+sudo yum install wget -y
+cd /home/ec2-user
+wget https://aws-codedeploy-ap-southeast-1.s3.ap-southeast-1.amazonaws.com/latest/install
+sudo chmod +x ./install
+sudo ./install auto
+
 # install nodejs
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
 sudo yum install -y nodejs
@@ -18,7 +27,7 @@ yarn --version
 cd /home/ec2-user
 
 # clone code
-git clone -b develop https://github.com/nphattai/chatty-backend.git
+git clone -b ci-cd https://github.com/nphattai/chatty-backend.git
 cd chatty-backend
 
 # install dependences

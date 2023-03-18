@@ -17,12 +17,21 @@ yarn --version
 
 cd /home/ec2-user
 
-git clone -b refactor-terraform https://github.com/nphattai/chatty-backend.git # replace this github url with your url of your own project
-cd chatty-backend # set your project name
+# clone code
+git clone -b develop https://github.com/nphattai/chatty-backend.git
+cd chatty-backend
+
+# install dependences
 yarn install
-aws s3 sync s3://funny-chatapp-env/development . # update with your s3 bucket
+
+# get env from s3
+aws s3 sync s3://funny-chatapp-env/development .
 unzip env-file.zip
 cp .env.development .env
+
+# build app
 sudo su
 yarn build
+
+#start app
 yarn start

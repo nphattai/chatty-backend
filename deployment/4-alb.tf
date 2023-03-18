@@ -49,21 +49,6 @@ resource "aws_alb_listener" "alb_http_listener" {
   }
 }
 
-# resource "aws_alb_listener_rule" "alb_https_listener_rule" {
-#   listener_arn = aws_alb_listener.alb_http_listener.arn
-#   priority     = 100
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_alb_target_group.server_backend_tg.arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/*"]
-#     }
-#   }
-
-# }
 #endregion
 
 #region Create ALB target group

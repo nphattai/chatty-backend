@@ -13,7 +13,9 @@ class HealthRoutes {
 
   public health(): Router {
     this.router.get('/health', (req: Request, res: Response) => {
-      res.status(HTTP_STATUS.OK).send(`Health: Server instance is healthy with process id ${process.pid} on ${moment().format('LL')}`);
+      res
+        .status(HTTP_STATUS.OK)
+        .send(`NEW VERSION Health: Server instance is healthy with process id ${process.pid} on ${moment().format('LL')}`);
     });
 
     return this.router;

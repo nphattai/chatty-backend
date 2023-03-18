@@ -1,4 +1,14 @@
 terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
+
+terraform {
   backend "s3" {
     bucket = "funny-chatapp" # unique AWS S3 bucket
     # create a sub-folder called development
@@ -6,6 +16,11 @@ terraform {
     region  = "ap-southeast-1"
     encrypt = true
   }
+}
+
+# Configure the AWS Provider
+provider "aws" {
+  region = var.aws_region
 }
 
 locals {

@@ -117,3 +117,15 @@ variable "project" {
   type        = string
   default     = "funny-chatapp"
 }
+
+variable "default_keypair" {
+  description = "Default keypair"
+  type        = string
+  default     = "funnychatappkeypair"
+}
+
+variable "default_api_port" {
+  description = "Default api port"
+  type        = number
+  default     = 5000
+}

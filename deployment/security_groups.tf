@@ -1,3 +1,4 @@
+#region Bastion host SG
 resource "aws_security_group" "bastion_host_sg" {
   name        = "${local.prefix}-bastion-host-sg"
   description = "Allows SSH into bastion host instance"
@@ -23,6 +24,9 @@ resource "aws_security_group" "bastion_host_sg" {
     tomap({ "Name" = "${local.prefix}-bastion-host-sg" })
   )
 }
+#endregion
+
+#region ALB SG
 
 resource "aws_security_group" "alb_sg" {
   name        = "${local.prefix}-alb-sg"
@@ -57,7 +61,9 @@ resource "aws_security_group" "alb_sg" {
     tomap({ "Name" = "${local.prefix}-alb-sg" })
   )
 }
+#endregion
 
+#region AGS SG
 resource "aws_security_group" "autoscaling_group_sg" {
   name        = "${local.prefix}-autoscaling-group-sg"
   description = "Allows internet access for instances lauched with ASG"
@@ -68,7 +74,7 @@ resource "aws_security_group" "autoscaling_group_sg" {
     to_port         = 80
     protocol        = "TCP"
     security_groups = [aws_security_group.alb_sg.id]
-    description     = "Allows HTTP traffic into webserver"
+    description     = "Allows HTTP traffic from ALB"
   }
 
   ingress {
@@ -76,7 +82,7 @@ resource "aws_security_group" "autoscaling_group_sg" {
     to_port         = 443
     protocol        = "TCP"
     security_groups = [aws_security_group.alb_sg.id]
-    description     = "Allows HTTPS traffic into webserver"
+    description     = "Allows HTTPS traffic from ALB"
   }
 
   ingress {
@@ -88,8 +94,8 @@ resource "aws_security_group" "autoscaling_group_sg" {
   }
 
   ingress {
-    from_port       = 5000
-    to_port         = 5000
+    from_port       = var.default_api_port
+    to_port         = var.default_api_port
     protocol        = "TCP"
     security_groups = [aws_security_group.alb_sg.id]
     description     = "Allows access to webserver through ALB"
@@ -107,7 +113,9 @@ resource "aws_security_group" "autoscaling_group_sg" {
     tomap({ "Name" = "${local.prefix}-autoscaling-group-sg" })
   )
 }
+#endregion
 
+#region Elasticache SG
 resource "aws_security_group" "elasticache_sg" {
   name        = "${local.prefix}-elasticache-sg"
   description = "Allows access to elasticache service"
@@ -141,3 +149,5 @@ resource "aws_security_group" "elasticache_sg" {
     tomap({ "Name" = "${local.prefix}-elasticache-sg" })
   )
 }
+
+#endregion

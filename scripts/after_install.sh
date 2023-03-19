@@ -9,5 +9,5 @@ unzip env-file.zip
 sudo cp .env.develop .env
 
 
-yarn stop
-yarn install
+sudo npm run stop
+sudo npm install

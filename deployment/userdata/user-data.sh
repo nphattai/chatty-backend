@@ -27,7 +27,7 @@ yarn --version
 cd /home/ec2-user
 
 # clone code
-git clone -b ci-cd https://github.com/nphattai/chatty-backend.git
+git clone -b develop https://github.com/nphattai/chatty-backend.git
 cd chatty-backend
 
 # install dependences

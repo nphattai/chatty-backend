@@ -1,0 +1,9 @@
+aws deploy create-deployment \
+    --application-name funny-chatapp-default-app \
+    --deployment-config-name CodeDeployDefault.AllAtOnce \
+    --deployment-group-name funny-chatapp-default-group \
+    --github-location repository=nphattai/chatty-backend,commitId=c0bfccf097c03ed3fa29077b4416ae813c7a843f
+
+
+
+    --s3-location bucket=funny-chatapp-default-app,bundleType=zip,key=chatty-backend.zip

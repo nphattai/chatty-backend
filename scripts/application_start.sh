@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd /home/ec2-user/chatty-backend
-yarn build
-yarn start
+sudo npm run build
+sudo npm run start
